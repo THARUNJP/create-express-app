@@ -6,6 +6,7 @@ import fs from "fs-extra";
 import path from "path";
 import { execSync } from "child_process";
 import ora from "ora";
+import { fileURLToPath } from "url";
 
 async function run() {
   console.log(chalk.cyan("\n🚀 Create Express App\n"));
@@ -21,14 +22,23 @@ async function run() {
 
   // Map selections to template folders
   const templateMap = {
-    "Small–Mid (Layered)": "ts-small-mid",
-    "Mid–Large (Modular)": "ts-mid-large",
-  };
+  "Small–Mid (Layered)": path.join(language === "JavaScript" ? "js" : "ts", "small"),
+  "Mid–Large (Modular)": path.join(language === "JavaScript" ? "js" : "ts", "modular"),
+};
 
   const templateFolder =
     language === "JavaScript" ? templateMap[architecture].replace("ts-", "js-") : templateMap[architecture];
 
-  const templatePath = path.resolve(new URL(import.meta.url).pathname, "../../templates", templateFolder);
+  // -------------------------
+  // Windows-friendly path fix
+  // -------------------------
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
+
+  // Repo root is two levels above packages/cli
+  const repoRoot = path.resolve(__dirname, "../../..");
+  const templatePath = path.join(repoRoot, "templates", templateFolder);
+
   const targetPath = path.resolve(process.cwd(), projectName);
 
   const spinner = ora("Copying template...").start();
@@ -36,6 +46,7 @@ async function run() {
     fs.copySync(templatePath, targetPath, { overwrite: true });
     spinner.succeed("Template copied successfully!");
 
+    // Install dependencies
     process.chdir(targetPath);
     const installSpinner = ora(`Installing dependencies using ${packageManager}...`).start();
     execSync(`${packageManager} install`, { stdio: "inherit" });
