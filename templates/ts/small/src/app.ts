@@ -1,23 +1,18 @@
 import express, { Application, Request, Response } from 'express';
-import { errorHandler, notFoundHandler } from './middleware/errorHandler';
-import exampleRoutes from './routes/example.routes';
+import { errorHandler } from './middleware/errorHandler';
+import routes from './routes/health.routes';
 
 const app: Application = express();
 
-// ── Core middleware ──────────────────────────────────────────────────────────
+// ── Core middleware 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ── Health check ─────────────────────────────────────────────────────────────
-app.get('/health', (_req: Request, res: Response) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
 
-// ── API routes ────────────────────────────────────────────────────────────────
-app.use('/api/examples', exampleRoutes);
+// ── API routes 
+app.use('/api', routes);
 
-// ── Error handling (must be last) ─────────────────────────────────────────────
-app.use(notFoundHandler);
+// ── Error handling (must be last)
 app.use(errorHandler);
 
 export default app;
