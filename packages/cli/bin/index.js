@@ -22,16 +22,13 @@ async function run() {
 
   // Map selections to template folders
   const templateMap = {
-  "Small–Mid (Layered)": path.join(language === "JavaScript" ? "js" : "ts", "small"),
-  "Mid–Large (Modular)": path.join(language === "JavaScript" ? "js" : "ts", "modular"),
-};
+    "Small–Mid (Layered)": path.join(language === "JavaScript" ? "js" : "ts", "small"),
+    "Mid–Large (Modular)": path.join(language === "JavaScript" ? "js" : "ts", "modular"),
+  };
 
-  const templateFolder =
-    language === "JavaScript" ? templateMap[architecture].replace("ts-", "js-") : templateMap[architecture];
+  const templateFolder = templateMap[architecture];
 
-  // -------------------------
   // Windows-friendly path fix
-  // -------------------------
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
 
@@ -42,9 +39,34 @@ async function run() {
   const targetPath = path.resolve(process.cwd(), projectName);
 
   const spinner = ora("Copying template...").start();
+
   try {
+    // Copy template
     fs.copySync(templatePath, targetPath, { overwrite: true });
     spinner.succeed("Template copied successfully!");
+
+    // -----------------------------
+    // ✅ Fix package.json dynamically
+    // -----------------------------
+    const pkgPath = path.join(targetPath, "package.json");
+
+    if (fs.existsSync(pkgPath)) {
+      const pkg = fs.readJsonSync(pkgPath);
+
+      // Set project name
+      pkg.name = projectName.toLowerCase().replace(/\s+/g, "-");
+
+      // Reset version
+      pkg.version = "1.0.0";
+
+      // Remove template-only fields
+      delete pkg.private;
+      delete pkg.repository;
+      delete pkg.bugs;
+      delete pkg.homepage;
+
+      fs.writeJsonSync(pkgPath, pkg, { spaces: 2 });
+    }
 
     // Install dependencies
     process.chdir(targetPath);
@@ -53,7 +75,9 @@ async function run() {
     installSpinner.succeed("Dependencies installed successfully!");
 
     console.log(chalk.green(`\n✅ Project ${projectName} is ready!`));
-    console.log(chalk.cyan(`\ncd ${projectName} && ${packageManager} install && ${packageManager} run dev`));
+    console.log(chalk.cyan(`\nNext steps:`));
+    console.log(chalk.white(`  cd ${projectName}`));
+    console.log(chalk.white(`  ${packageManager} run dev\n`));
   } catch (err) {
     spinner.fail("Failed to create project.");
     console.error(err);
