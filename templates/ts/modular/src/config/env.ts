@@ -1,21 +1,19 @@
-import dotenv from 'dotenv';
+import z from "zod";
 
-dotenv.config();
+const envSchema = z.object({
+  NODE_ENV: z
+    .enum(["development", "production", "test"])
+    .default("development"),
 
-const requiredEnvVars = ['NODE_ENV', 'PORT'] as const;
+  PORT: z
+    .string()
+    .default("8000")
+    .transform((val) => Number(val)),
+});
 
-for (const key of requiredEnvVars) {
-  if (!process.env[key]) {
-    throw new Error(`Missing required environment variable: ${key}`);
-  }
-}
+const env = envSchema.parse(process.env);
 
-export const env = {
-  NODE_ENV: process.env.NODE_ENV as 'development' | 'production' | 'test',
-  PORT: parseInt(process.env.PORT ?? '3000', 10),
-  DATABASE_URL: process.env.DATABASE_URL ?? '',
-  JWT_SECRET: process.env.JWT_SECRET ?? 'changeme',
-  JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN ?? '7d',
-  isDev: process.env.NODE_ENV === 'development',
-  isProd: process.env.NODE_ENV === 'production',
+export const appEnv = {
+  nodeEnv: env.NODE_ENV,
+  port: env.PORT,
 };

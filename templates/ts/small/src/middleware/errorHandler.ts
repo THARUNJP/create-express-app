@@ -1,44 +1,50 @@
-import { Request, Response, NextFunction } from 'express';
-import { HTTP_STATUS } from '../lib/constants';
-import { env } from '../config/env';
+import { Request, Response, NextFunction } from "express";
 
 export class AppError extends Error {
-  public readonly statusCode: number;
-  public readonly isOperational: boolean;
+  statusCode: number;
+  isOperational: boolean;
 
-  constructor(message: string, statusCode = HTTP_STATUS.INTERNAL_SERVER_ERROR, isOperational = true) {
+  constructor(message: string, statusCode = 500) {
     super(message);
     this.statusCode = statusCode;
-    this.isOperational = isOperational;
-    Object.setPrototypeOf(this, new.target.prototype);
-    Error.captureStackTrace(this);
+    this.isOperational = true;
+
+    Error.captureStackTrace(this, this.constructor);
   }
 }
 
-// 404 handler — place before errorHandler in app.ts
-export const notFoundHandler = (req: Request, res: Response, next: NextFunction): void => {
-  next(new AppError(`Route not found: ${req.method} ${req.originalUrl}`, HTTP_STATUS.NOT_FOUND));
-};
-
-// Global error handler — place last in app.ts
 export const errorHandler = (
-  err: Error | AppError,
+  err: unknown,
   req: Request,
   res: Response,
   _next: NextFunction
-): void => {
-  const statusCode = err instanceof AppError ? err.statusCode : HTTP_STATUS.INTERNAL_SERVER_ERROR;
-  const message = err instanceof AppError && err.isOperational
-    ? err.message
-    : 'Internal server error';
+) => {
+  let statusCode = 500;
+  let message = "Internal Server Error";
 
-  if (env.isDev) {
-    console.error('[Error]', err);
+  // Trusted operational errors
+  if (err instanceof AppError) {
+    statusCode = err.statusCode;
+    message = err.message;
   }
+
+  // Unknown JS errors
+  else if (err instanceof Error) {
+    message = err.message;
+  }
+
+  // Log full error (never expose stack in prod)
+  console.error({
+    statusCode,
+    message: err instanceof Error ? err.message : String(err),
+    stack: err instanceof Error ? err.stack : undefined,
+    method: req.method,
+    url: req.originalUrl,
+    timestamp: new Date().toISOString(),
+  });
 
   res.status(statusCode).json({
     success: false,
     message,
-    ...(env.isDev && { stack: err.stack }),
   });
 };
