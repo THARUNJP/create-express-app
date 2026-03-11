@@ -6,8 +6,6 @@ export async function healthz(_req: Request, res: Response): Promise<Response> {
     const health = HealthService.healthCheck();
     return res.status(HTTP_STATUS.OK).json(health);
   } catch (error: unknown) {
-    console.error("Health check failed:", error);
-
     return res.status(503).json({
       status: "error",
       message: "Service unavailable",
