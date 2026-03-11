@@ -1,20 +1,16 @@
-import { Request, Response, NextFunction } from 'express';
-import { healthService } from './health.service';
-import { HTTP_STATUS } from '../../lib/constants';
-import { HealthQuery } from '../../types/index.d';
+import { Request, Response } from "express";
+import * as HealthService from "./health.service";
+import { HTTP_STATUS } from "../../lib/constants";
 
-type HealthRequest = Request<{}, {}, {}, HealthQuery>;
-
-export class HealthController {
-  check(req: HealthRequest, res: Response, next: NextFunction): void {
-    try {
-      const verbose = req.query.verbose === (true as unknown as boolean);
-      const data = verbose ? healthService.getDetailed() : healthService.getBasic();
-      res.status(HTTP_STATUS.OK).json({ success: true, data });
-    } catch (err) {
-      next(err);
-    }
+export function healthz(_req: Request, res: Response): Response {
+  try {
+    const health = HealthService.healthCheck();
+    return res.status(HTTP_STATUS.OK).json(health);
+  } catch (error: unknown) {
+    return res.status(503).json({
+      status: "error",
+      message: "Service unavailable",
+      timestamp: new Date().toISOString(),
+    });
   }
 }
-
-export const healthController = new HealthController();

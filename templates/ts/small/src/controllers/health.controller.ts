@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import * as HealthService from "../services/health.service";
 import { HTTP_STATUS } from "../lib/constants";
-export async function healthz(_req: Request, res: Response): Promise<Response> {
+
+export function healthz(_req: Request, res: Response): Response {
   try {
     const health = HealthService.healthCheck();
     return res.status(HTTP_STATUS.OK).json(health);
