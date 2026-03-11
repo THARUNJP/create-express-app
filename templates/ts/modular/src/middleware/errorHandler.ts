@@ -1,23 +1,11 @@
 import { Request, Response, NextFunction } from "express";
-
-export class AppError extends Error {
-  statusCode: number;
-  isOperational: boolean;
-
-  constructor(message: string, statusCode = 500) {
-    super(message);
-    this.statusCode = statusCode;
-    this.isOperational = true;
-
-    Error.captureStackTrace(this, this.constructor);
-  }
-}
+import AppError from "../lib/errors/appError";
 
 export const errorHandler = (
   err: unknown,
   req: Request,
   res: Response,
-  _next: NextFunction
+  _next: NextFunction,
 ) => {
   let statusCode = 500;
   let message = "Internal Server Error";
