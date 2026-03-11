@@ -53,7 +53,7 @@ async function run() {
     installSpinner.succeed("Dependencies installed successfully!");
 
     console.log(chalk.green(`\n✅ Project ${projectName} is ready!`));
-    console.log(chalk.cyan(`\ncd ${projectName} && ${packageManager} run dev`));
+    console.log(chalk.cyan(`\ncd ${projectName} && ${packageManager} install && ${packageManager} run dev`));
   } catch (err) {
     spinner.fail("Failed to create project.");
     console.error(err);
