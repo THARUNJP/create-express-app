@@ -11,12 +11,6 @@ export const HTTP_STATUS = {
   INTERNAL_SERVER_ERROR: 500,
 } as const;
 
-export const PAGINATION = {
-  DEFAULT_PAGE: 1,
-  DEFAULT_LIMIT: 20,
-  MAX_LIMIT: 100,
-} as const;
-
 export const MESSAGES = {
   NOT_FOUND: 'Resource not found',
   UNAUTHORIZED: 'Unauthorized',
