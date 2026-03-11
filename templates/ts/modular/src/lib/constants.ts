@@ -6,6 +6,7 @@ export const HTTP_STATUS = {
   UNAUTHORIZED: 401,
   FORBIDDEN: 403,
   NOT_FOUND: 404,
+  CONFLICT: 409,
   UNPROCESSABLE_ENTITY: 422,
   INTERNAL_SERVER_ERROR: 500,
 } as const;
@@ -16,4 +17,7 @@ export const MESSAGES = {
   FORBIDDEN: 'Forbidden',
   INTERNAL_ERROR: 'Internal server error',
   VALIDATION_ERROR: 'Validation failed',
+  CREATED: 'Resource created successfully',
+  UPDATED: 'Resource updated successfully',
+  DELETED: 'Resource deleted successfully',
 } as const;
