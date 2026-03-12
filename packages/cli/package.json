@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Scaffold production-ready Express.js apps with JS/TS and scalable architectures",
   "bin": {
-    "create-express-app": "./bin/index.js"
+    "create-express-app": "bin/index.js"
   },
   "type": "module",
   "files": [
