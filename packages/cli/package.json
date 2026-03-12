@@ -1,5 +1,5 @@
 {
-  "name": "express-blueprint",
+  "name": "express-clean-app",
   "version": "1.0.0",
   "description": "Scaffold production-ready Express.js apps with JS/TS and scalable architectures",
   "bin": {
