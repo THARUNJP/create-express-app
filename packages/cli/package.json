@@ -6,6 +6,7 @@
     "create-express-app": "./bin/index.js"
   },
   "type": "module",
+  "files": ["bin", "templates", "README.md", "LICENSE"],
   "keywords": ["express","nodejs","typescript","javascript","starter","cli"],
   "license": "MIT",
   "dependencies": {
